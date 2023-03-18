@@ -61,7 +61,7 @@ class Jobs extends Component {
     searchInput: '',
     salaryRangeId: '',
     jobsList: [],
-    employmentTypeId: '',
+    employmentTypeId: [],
     apiStatus: apiStatusConstants.initial,
   }
 
@@ -74,8 +74,9 @@ class Jobs extends Component {
       apiStatus: apiStatusConstants.inProgress,
     })
     const {employmentTypeId, searchInput, salaryRangeId} = this.state
+    const empTypeId = employmentTypeId.join(',')
     const jwtToken = Cookies.get('jwt_token')
-    const apiUrl = `https://apis.ccbp.in/jobs?employment_type=${employmentTypeId}&minimum_package=${salaryRangeId}&title_search=${searchInput}`
+    const apiUrl = `https://apis.ccbp.in/jobs?employment_type=${empTypeId}&minimum_package=${salaryRangeId}&title_search=${searchInput}`
     const options = {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
@@ -173,17 +174,41 @@ class Jobs extends Component {
     this.getJobs()
   }
 
-  getSearchInput = event => {
+  changeSearchInput = event => {
     this.setState({searchInput: event.target.value})
   }
 
-  getSearchEntry = () => {
-    const {searchInput} = this.state
-    this.setState({searchInput}, this.getJobs)
+  getSearchInput = () => {
+    this.getJobs()
+  }
+
+  getSelectedSalaryRange = id => {
+    this.setState({salaryRangeId: id}, this.getJobs)
+  }
+
+  changeSalaryRangeId = event => {
+    if (event.target.checked) {
+      this.getSelectedSalaryRange(event.target.id)
+    }
+  }
+
+  getSelectedEmploymentType = id => {
+    this.setState(
+      prevState => ({
+        employmentTypeId: [...prevState.employmentTypeId, id],
+      }),
+      this.getJobs,
+    )
+  }
+
+  changeEmploymentTypeId = event => {
+    if (event.target.checked) {
+      this.getSelectedEmploymentType(event.target.id)
+    }
   }
 
   render() {
-    const {searchInput} = this.state
+    const {searchInput, employmentTypeId, salaryRangeId} = this.state
 
     return (
       <>
@@ -192,14 +217,14 @@ class Jobs extends Component {
           <div className="responsive-cont">
             <div className="s-search-box">
               <input
-                onChange={this.getSearchInput}
+                onChange={this.changeSearchInput}
                 className="s-search"
                 type="search"
-                value={searchInput}
                 placeholder="Search"
+                value={searchInput}
               />
               <button
-                onClick={this.getSearchEntry}
+                onClick={this.getSearchInput}
                 data-testid="searchButton"
                 type="button"
                 className="search-icon"
@@ -214,8 +239,10 @@ class Jobs extends Component {
               {employmentTypesList.map(type => (
                 <li className="item">
                   <input
+                    onChange={this.changeEmploymentTypeId}
                     className="checkbox"
                     id={type.employmentTypeId}
+                    value={employmentTypeId}
                     type="checkbox"
                   />
                   <label htmlFor={type.employmentTypeId} className="labe-text">
@@ -232,6 +259,7 @@ class Jobs extends Component {
                   <input
                     onChange={this.changeSalaryRangeId}
                     name="salary range"
+                    value={salaryRangeId}
                     className="checkbox"
                     type="radio"
                     id={range.salaryRangeId}
@@ -246,14 +274,14 @@ class Jobs extends Component {
           <div className="each-jobs-cont">
             <div className="l-search-box">
               <input
-                onChange={this.getSearchInput}
+                onChange={this.changeSearchInput}
                 className="l-search"
                 type="search"
                 value={searchInput}
                 placeholder="Search"
               />
               <button
-                onClick={this.getSearchEntry}
+                onClick={this.getSearchInput}
                 data-testid="searchButton"
                 type="button"
                 className="search-icon"
