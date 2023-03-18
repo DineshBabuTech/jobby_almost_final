@@ -115,9 +115,9 @@ class Jobs extends Component {
       />
       <h1 className="jobs-failure-heading-text">Oops! Something Went Wrong</h1>
       <p className="jobs-failure-description">
-        We are having some trouble processing your request. Please try again.
+        We cannot seem to find the page you are looking for
       </p>
-      <button onClick={this.againGetJobs()} className="retry-btn" type="button">
+      <button onClick={this.againGetJobs} className="retry-btn" type="button">
         Retry
       </button>
     </div>
